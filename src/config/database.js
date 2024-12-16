@@ -3,11 +3,11 @@ const { Pool } = pkg;
 import 'dotenv/config';
 
 const pool = new Pool({
-  host: process.env.DB_HOST,
-  port: process.env.DB_PORT,
-  database: process.env.DB_NAME,
-  user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
+  host: "kesavan.db.elephantsql.com",
+  port: 5432,
+  database: "rvpkczjr",
+  user: "rvpkczjr",
+  password: "gItECzAW6G00yA6faJs18VQ2vgCB8YHv",
 });
 
 export default pool;
