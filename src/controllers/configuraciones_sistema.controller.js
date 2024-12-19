@@ -80,7 +80,7 @@ export const getAllConfiguraciones = async (req, res) => {
 export const registrarESP32 = async (req, res) => {
   const { id_esp32, ip_address, ssid } = req.body;
 
-  if (!id_esp32 || !ssid || !password) {
+  if (!id_esp32 || !ip_address || !ssid) {
     return res
       .status(400)
       .json({ message: "Todos los campos son obligatorios" });
