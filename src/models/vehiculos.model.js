@@ -10,15 +10,16 @@ class Vehiculo {
 
   // Crear nuevo vehículo
   static async create(vehiculoData) {
-    const { placa, marca, modelo, anio, propietario_cedula } = vehiculoData;
+    const { placa, marca, modelo, anio, propietario_cedula, id_esp32 } =
+      vehiculoData;
 
     const query = `
-      INSERT INTO vehiculos (placa, marca, modelo, anio, propietario_cedula, validado)
-      VALUES ($1, $2, $3, $4, $5, false) -- Por defecto, no validado
-      RETURNING id, placa, marca, modelo, anio, propietario_cedula, validado, estado, fecha_registro
+      INSERT INTO vehiculos (placa, marca, modelo, anio, propietario_cedula, id_esp32, validado)
+      VALUES ($1, $2, $3, $4, $5, $6, false) -- Por defecto, no validado
+      RETURNING id, placa, marca, modelo, anio, propietario_cedula, id_esp32, validado, estado, fecha_registro
     `;
 
-    const values = [placa, marca, modelo, anio, propietario_cedula];
+    const values = [placa, marca, modelo, anio, propietario_cedula, id_esp32];
     const result = await pool.query(query, values);
     return result.rows[0];
   }
@@ -85,6 +86,18 @@ class Vehiculo {
     const query = "SELECT * FROM vehiculos WHERE propietario_cedula = $1";
     const result = await pool.query(query, [propietarioCedula]);
     return result.rows;
+  }
+
+  // Asociar vehiculo a esp32
+  static async updateESP32(id, id_esp32) {
+    const query = `
+      UPDATE vehiculos
+      SET id_esp32 = $1
+      WHERE id = $2 AND estado = true
+      RETURNING id, placa, marca, modelo, anio, propietario_cedula, id_esp32, estado, fecha_registro
+    `;
+    const result = await pool.query(query, [id_esp32, id]);
+    return result.rows[0];
   }
 }
 

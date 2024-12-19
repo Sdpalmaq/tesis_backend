@@ -1,6 +1,20 @@
 import pool from "../config/database.js";
 
 class ConfiguracionSistema {
+  
+  static async registrarESP32(idEsp32, ipAddress, ssid) {
+    const query = `
+      INSERT INTO configuraciones_sistema (clave, valor, descripcion)
+      VALUES ('id_esp32', $1, 'Identificador ESP32'),
+             ('ip_address', $2, 'Dirección IP'),
+             ('ssid', $3, 'Red Wi-Fi')
+      ON CONFLICT (clave) DO UPDATE SET valor = EXCLUDED.valor
+      RETURNING *;
+    `
+    const result = await pool.query(query, [idEsp32, ipAddress, ssid]);
+    return result.rows;
+  }
+
   // Obtener configuración por clave
   static async findByKey(clave) {
     const query = "SELECT * FROM configuraciones_sistema WHERE clave = $1";

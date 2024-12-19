@@ -134,3 +134,25 @@ export const getVehiculos = async (req, res) => {
     res.status(500).json({ error: "Error en el servidor" });
   }
 };
+
+// Asociar ESP32 a un vehículo
+export const associateESP32 = async (req, res) => {
+  const { id, id_esp32 } = req.body;
+
+  try {
+    const vehiculo = await Vehiculo.findById(id);
+    if (!vehiculo) {
+      return res.status(404).json({ error: "Vehículo no encontrado" });
+    }
+
+    const updatedVehiculo = await Vehiculo.updateESP32(id, id_esp32);
+    res.status(200).json({
+      message: "ESP32 asociado correctamente al vehículo.",
+      vehiculo: updatedVehiculo,
+    });
+  } catch (error) {
+    console.error("Error al asociar ESP32:", error);
+    res.status(500).json({ error: "Error en el servidor" });
+  }
+};
+

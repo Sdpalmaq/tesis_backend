@@ -1,21 +1,23 @@
-import { Router } from "express";
+import express from "express";
 import {
+  getConfiguracionByKey,
   upsertConfiguracion,
-  getConfiguraciones,
+  getAllConfiguraciones,
+  registrarESP32,
 } from "../controllers/configuraciones_sistema.controller.js";
-import { verifyToken } from "../middleware/auth.middleware.js";
-import { isAdmin } from "../middleware/admin.middleware.js";
-import { validateRequest } from "../middleware/validate.middleware.js";
-import { upsertConfiguracionValidator } from "../validators/configuracionesSistema.validator.js";
 
-const router = Router();
+const router = express.Router();
 
-router.post(
-  "/",
-  [verifyToken, isAdmin, upsertConfiguracionValidator, validateRequest],
-  upsertConfiguracion
-);
+// Ruta para registrar configuración ESP32
+router.post("/registrar-esp32", registrarESP32);
 
-router.get("/", verifyToken, getConfiguraciones);
+// Ruta para obtener configuración por clave
+router.get("/:clave", getConfiguracionByKey);
+
+// Ruta para crear o actualizar configuración
+router.post("/", upsertConfiguracion);
+
+// Ruta para obtener todas las configuraciones
+router.get("/", getAllConfiguraciones);
 
 export default router;

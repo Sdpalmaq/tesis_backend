@@ -6,6 +6,7 @@ import {
   deleteVehiculo,
   getPendingVehiculos,
   validateVehiculo,
+  associateESP32,
 } from "../controllers/vehiculos.controller.js";
 import { verifyToken } from "../middleware/auth.middleware.js";
 import { isAdmin } from "../middleware/admin.middleware.js";
@@ -22,6 +23,9 @@ router.post(
   [verifyToken, createVehiculoValidator, validateRequest],
   createVehiculo
 );
+
+// Ruta para asociar una ESP32 a un vehículo
+router.post("/asociar-esp32", associateESP32);
 
 router.get("/", verifyToken, getVehiculos);
 
