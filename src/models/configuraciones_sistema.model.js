@@ -1,45 +1,60 @@
 import pool from "../config/database.js";
 
 class ConfiguracionSistema {
-  
-  static async registrarESP32(idEsp32, ipAddress, ssid) {
+  // Registrar una nueva placa ESP32
+  static async create(id_esp32, descripcion = null) {
     const query = `
-      INSERT INTO configuraciones_sistema (clave, valor, descripcion)
-      VALUES ('id_esp32', $1, 'Identificador ESP32'),
-             ('ip_address', $2, 'Dirección IP'),
-             ('ssid', $3, 'Red Wi-Fi')
-      ON CONFLICT (clave) DO UPDATE SET valor = EXCLUDED.valor
-      RETURNING *;
-    `
-    const result = await pool.query(query, [idEsp32, ipAddress, ssid]);
-    return result.rows;
-  }
-
-  // Obtener configuración por clave
-  static async findByKey(clave) {
-    const query = "SELECT * FROM configuraciones_sistema WHERE clave = $1";
-    const result = await pool.query(query, [clave]);
-    return result.rows[0];
-  }
-
-  // Crear o actualizar configuración
-  static async upsert(clave, valor, descripcion = null) {
-    const query = `
-      INSERT INTO configuraciones_sistema (clave, valor, descripcion)
-      VALUES ($1, $2, $3)
-      ON CONFLICT (clave) 
-      DO UPDATE SET valor = EXCLUDED.valor, descripcion = EXCLUDED.descripcion
-      RETURNING id, clave, valor, descripcion
+      INSERT INTO configuraciones_sistema (id_esp32, descripcion, asociado)
+      VALUES ($1, $2, FALSE)
+      RETURNING id_esp32, descripcion, asociado, created_at
     `;
-    const result = await pool.query(query, [clave, valor, descripcion]);
+    const values = [id_esp32, descripcion];
+    const result = await pool.query(query, values);
     return result.rows[0];
   }
 
-  // Obtener todas las configuraciones
+  // Obtener información de una placa ESP32 por su ID
+  static async findById(id_esp32) {
+    const query = `
+      SELECT id_esp32, descripcion, asociado, created_at
+      FROM configuraciones_sistema
+      WHERE id_esp32 = $1
+    `;
+    const result = await pool.query(query, [id_esp32]);
+    return result.rows[0];
+  }
+
+  // Obtener todas las placas ESP32 registradas
   static async findAll() {
-    const query = "SELECT * FROM configuraciones_sistema ORDER BY clave";
+    const query = `
+      SELECT id_esp32, descripcion, asociado, created_at
+      FROM configuraciones_sistema
+      ORDER BY created_at DESC
+    `;
     const result = await pool.query(query);
     return result.rows;
+  }
+
+  // Asociar una placa ESP32 con un vehículo
+  static async associate(id_esp32, descripcion) {
+    const query = `
+      UPDATE configuraciones_sistema
+      SET descripcion = $1, asociado = TRUE
+      WHERE id_esp32 = $2
+      RETURNING id_esp32, descripcion, asociado
+    `;
+    const result = await pool.query(query, [descripcion, id_esp32]);
+    return result.rows[0];
+  }
+
+  // Eliminar una placa ESP32
+  static async delete(id_esp32) {
+    const query = `
+      DELETE FROM configuraciones_sistema
+      WHERE id_esp32 = $1
+    `;
+    const result = await pool.query(query, [id_esp32]);
+    return result.rowCount > 0;
   }
 }
 

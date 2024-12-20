@@ -1,23 +1,27 @@
 import express from "express";
 import {
-  getConfiguracionByKey,
-  upsertConfiguracion,
-  getAllConfiguraciones,
-  registrarESP32,
+  createConfiguracion,
+  getConfiguracionById,
+  getConfiguraciones,
+  associateConfiguracion,
+  deleteConfiguracion,
 } from "../controllers/configuraciones_sistema.controller.js";
 
 const router = express.Router();
 
-// Ruta para registrar configuración ESP32
-router.post("/registrar-esp32", registrarESP32);
+// Crear una nueva placa ESP32
+router.post("/", createConfiguracion);
 
-// Ruta para obtener configuración por clave
-router.get("/:clave", getConfiguracionByKey);
+// Obtener todas las placas ESP32
+router.get("/", getConfiguraciones);
 
-// Ruta para crear o actualizar configuración
-router.post("/", upsertConfiguracion);
+// Obtener una placa ESP32 por ID
+router.get("/:id_esp32", getConfiguracionById);
 
-// Ruta para obtener todas las configuraciones
-router.get("/", getAllConfiguraciones);
+// Asociar una placa ESP32 con un vehículo
+router.put("/:id_esp32", associateConfiguracion);
+
+// Eliminar una placa ESP32
+router.delete("/:id_esp32", deleteConfiguracion);
 
 export default router;
