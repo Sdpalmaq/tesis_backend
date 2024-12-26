@@ -82,9 +82,16 @@ class Vehiculo {
     return result.rows;
   }
 
-  static async findByPropietario(propietarioCedula) {
-    const query = "SELECT * FROM vehiculos WHERE propietario_cedula = $1";
-    const result = await pool.query(query, [propietarioCedula]);
+  // Obtener vehículos por propietario
+  static async findByPropietario(propietario_cedula) {
+    const query = `
+    SELECT 
+      v.id, v.placa, v.marca, v.modelo, v.anio, v.id_esp32, v.estado, v.validado
+    FROM vehiculos v
+    WHERE v.propietario_cedula = $1 AND v.estado = true
+    ORDER BY v.fecha_registro DESC
+  `;
+    const result = await pool.query(query, [propietario_cedula]);
     return result.rows;
   }
 

@@ -135,6 +135,24 @@ export const getVehiculos = async (req, res) => {
   }
 };
 
+export const getVehiculosByPropietario = async (req, res) => {
+  try {
+    const { propietario_cedula } = req.params; // Obtener el ID del propietario de los parámetros
+    const vehiculos = await Vehiculo.findByPropietario(propietario_cedula);
+
+    if (!vehiculos.length) {
+      return res
+        .status(404)
+        .json({ message: "No se encontraron vehículos para este usuario." });
+    }
+
+    res.status(200).json(vehiculos);
+  } catch (error) {
+    console.error("Error al obtener vehículos:", error);
+    res.status(500).json({ message: "Error en el servidor." });
+  }
+};
+
 // Asociar ESP32 a un vehículo
 export const associateESP32 = async (req, res) => {
   const { id, id_esp32 } = req.body;
@@ -155,4 +173,3 @@ export const associateESP32 = async (req, res) => {
     res.status(500).json({ error: "Error en el servidor" });
   }
 };
-

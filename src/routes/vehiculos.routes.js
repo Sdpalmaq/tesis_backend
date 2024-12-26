@@ -7,6 +7,7 @@ import {
   getPendingVehiculos,
   validateVehiculo,
   associateESP32,
+  getVehiculosByPropietario,
 } from "../controllers/vehiculos.controller.js";
 import { verifyToken } from "../middleware/auth.middleware.js";
 import { isAdmin } from "../middleware/admin.middleware.js";
@@ -31,14 +32,16 @@ router.get("/", verifyToken, getVehiculos);
 
 router.put(
   "/:id",
-  [verifyToken, isAdmin, updateVehiculoValidator, validateRequest],
+  [verifyToken, updateVehiculoValidator, validateRequest],
   updateVehiculo
 );
 
-router.delete("/:id", [verifyToken, isAdmin], deleteVehiculo);
+router.delete("/:id", [verifyToken], deleteVehiculo);
 
 router.get("/pending", [verifyToken, isAdmin], getPendingVehiculos);
 
 router.patch("/:id/validate", [verifyToken, isAdmin], validateVehiculo);
+
+router.get("/:propietario_cedula", getVehiculosByPropietario);
 
 export default router;
