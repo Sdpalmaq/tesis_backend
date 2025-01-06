@@ -14,7 +14,7 @@ router.post("/registrar", registrarHuella);
 router.delete("/eliminar/:id_esp32/:id_huella", eliminarHuella);
 
 // Obtener huellas de un vehículo
-router.get("/get-huellas/:id_vehiculo", getHuellasByVehiculo);
+router.get("/get-huellas/:vehiculo_id", getHuellasByVehiculo);
 
 // Reiniciar huellas en una placa
 //router.delete("/reset/:id_esp32", resetHuellas);

@@ -17,7 +17,14 @@ class HuellasDactilares {
       VALUES ($1, $2, $3, $4, $5, $6)
       RETURNING *;
     `;
-    const values = [id_esp32, id_huella, nombre_persona, dedo, usuario_cedula, vehiculo_id];
+    const values = [
+      id_esp32,
+      id_huella,
+      nombre_persona,
+      dedo,
+      usuario_cedula,
+      vehiculo_id,
+    ];
     const result = await pool.query(query, values);
     return result.rows[0];
   }
@@ -40,6 +47,17 @@ class HuellasDactilares {
     `;
     const result = await pool.query(query, [id_esp32, id_huella]);
     return result.rowCount > 0;
+  }
+
+  // Obtener huellas por vehiculo
+  static async findByVehiculo(vehiculo_id) {
+    const query = `
+      SELECT id_huella, nombre_persona, dedo, fecha_registro, id_esp32
+      FROM huellas_dactilares
+      WHERE vehiculo_id = $1
+    `;
+    const result = await pool.query(query, [vehiculo_id]);
+    return result.rows;
   }
 }
 
