@@ -1,24 +1,22 @@
-import { Router } from "express";
+import express from "express";
 import {
-  createHuella,
-  getHuellas,
-  deleteHuella,
+  registrarHuella,
+  eliminarHuella,
+  getHuellasByVehiculo
 } from "../controllers/huellas_dactilares.controller.js";
-import { verifyToken } from "../middleware/auth.middleware.js";
-import { isAdmin } from "../middleware/admin.middleware.js";
-import { validateRequest } from "../middleware/validate.middleware.js";
-import { createHuellaValidator } from "../validators/huellasDactilares.validator.js";
 
-const router = Router();
+const router = express.Router();
 
-router.post(
-  "/",
-  [verifyToken, isAdmin, createHuellaValidator, validateRequest],
-  createHuella
-);
+// Registrar huella
+router.post("/registrar", registrarHuella);
 
-router.get("/", verifyToken, getHuellas);
+// Eliminar huella específica
+router.delete("/eliminar/:id_esp32/:id_huella", eliminarHuella);
 
-router.delete("/:id", [verifyToken, isAdmin], deleteHuella);
+// Obtener huellas de un vehículo
+router.get("/get-huellas/:id_vehiculo", getHuellasByVehiculo);
+
+// Reiniciar huellas en una placa
+//router.delete("/reset/:id_esp32", resetHuellas);
 
 export default router;

@@ -7,7 +7,7 @@ export const createHuellaValidator = [
     .matches(/^[0-9]+$/)
     .withMessage("La cédula solo debe contener números"),
 
-  check("huella")
+  check("id_huella")
     .notEmpty()
     .withMessage("La huella es requerida"),
 ];

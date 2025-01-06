@@ -1,45 +1,46 @@
 import pool from "../config/database.js";
 
-class HuellaDactilar {
-  // Buscar huella por ID de usuario y vehículo
-  static async findByUserAndVehicle(usuarioCedula, vehiculoId) {
-    const query =
-      "SELECT * FROM huellas_dactilares WHERE usuario_cedula = $1 AND vehiculo_id = $2 AND estado = true";
-    const result = await pool.query(query, [usuarioCedula, vehiculoId]);
-    return result.rows[0];
-  }
-
-  // Crear nueva huella dactilar
+class HuellasDactilares {
+  // Crear una nueva huella
   static async create(huellaData) {
-    const { usuario_cedula, vehiculo_id, datos_huella, nombre_huella } =
-      huellaData;
+    const {
+      id_esp32,
+      id_huella,
+      nombre_persona,
+      dedo,
+      usuario_cedula,
+      vehiculo_id,
+    } = huellaData;
 
     const query = `
-      INSERT INTO huellas_dactilares (usuario_cedula, vehiculo_id, datos_huella, nombre_huella)
-      VALUES ($1, $2, $3, $4)
-      RETURNING id, usuario_cedula, vehiculo_id, datos_huella, nombre_huella, estado, fecha_registro
+      INSERT INTO huellas_dactilares (id_esp32, id_huella, nombre_persona, dedo, usuario_cedula, vehiculo_id)
+      VALUES ($1, $2, $3, $4, $5, $6)
+      RETURNING *;
     `;
-
-    const values = [usuario_cedula, vehiculo_id, datos_huella, nombre_huella];
+    const values = [id_esp32, id_huella, nombre_persona, dedo, usuario_cedula, vehiculo_id];
     const result = await pool.query(query, values);
     return result.rows[0];
   }
 
-  // Obtener todas las huellas activas
-  static async findAll() {
-    const query =
-      "SELECT * FROM huellas_dactilares WHERE estado = true ORDER BY fecha_registro DESC";
-    const result = await pool.query(query);
-    return result.rows;
+  // Verificar si existe una huella en una placa
+  static async findByIdEsp32AndHuella(id_esp32, id_huella) {
+    const query = `
+      SELECT * FROM huellas_dactilares
+      WHERE id_esp32 = $1 AND id_huella = $2;
+    `;
+    const result = await pool.query(query, [id_esp32, id_huella]);
+    return result.rows[0];
   }
 
-  // Soft delete de huella dactilar
-  static async delete(id) {
-    const query =
-      "UPDATE huellas_dactilares SET estado = false WHERE id = $1 AND estado = true";
-    const result = await pool.query(query, [id]);
+  // Eliminar una huella
+  static async deleteByIdEsp32AndHuella(id_esp32, id_huella) {
+    const query = `
+      DELETE FROM huellas_dactilares
+      WHERE id_esp32 = $1 AND id_huella = $2;
+    `;
+    const result = await pool.query(query, [id_esp32, id_huella]);
     return result.rowCount > 0;
   }
 }
 
-export default HuellaDactilar;
+export default HuellasDactilares;
