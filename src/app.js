@@ -11,6 +11,8 @@ import huellasRouetes from "./routes/huellasDactilares.routes.js";
 import configSistemRoutes from "./routes/configuracionesSistema.routes.js";
 import registroAccesoRoutes from "./routes/registrosAcceso.routes.js";
 import wifiRoutes from "./routes/wifi.routes.js";
+import arranque_forzoso from "./routes/arranque_forzoso.routes.js";
+import restaurarSistema from "./routes/restaurarSistema.routes.js";
 
 const app = express();
 
@@ -41,6 +43,8 @@ app.use("/api/huellas-dactilares", huellasRouetes);
 app.use("/api/configuraciones-sistema", configSistemRoutes);
 app.use("/api/registros-acceso", registroAccesoRoutes);
 app.use("/api/wifi", wifiRoutes);
+app.use("/api/forzar-arranque", arranque_forzoso);
+app.use("/api/sistema", restaurarSistema);
 
 // Error handling
 app.use((err, req, res, next) => {
