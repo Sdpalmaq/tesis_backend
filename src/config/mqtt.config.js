@@ -40,6 +40,11 @@ export const publishMessage = (topic, message) => {
   });
 };
 
+export const sendNotification = (id_esp32, message) => {
+  const topic = `sistema/${id_esp32}/notificaciones`;
+  publishMessage(topic, JSON.stringify({ message }));
+};
+
 // Suscribirse a un tópico
 export const subscribeToTopic = (topic, callback) => {
   client.subscribe(topic, { qos: 1 }, (error) => {

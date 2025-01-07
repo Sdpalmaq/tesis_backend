@@ -3,6 +3,15 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 import "dotenv/config";
 import morgan from "morgan";
+import { wss } from './server.js';
+
+const app = express();
+
+app.use((req, res, next) => {
+    req.wss = wss; // Agregar la instancia del WebSocket Server a cada request
+    next();
+});
+
 
 import authRoutes from "./routes/auth.routes.js";
 import userRoutes from "./routes/user.routes.js";
@@ -13,8 +22,9 @@ import registroAccesoRoutes from "./routes/registrosAcceso.routes.js";
 import wifiRoutes from "./routes/wifi.routes.js";
 import arranque_forzoso from "./routes/arranque_forzoso.routes.js";
 import restaurarSistema from "./routes/restaurarSistema.routes.js";
+import notificaciones from "./routes/notificaciones.routes.js";
 
-const app = express();
+
 
 // Error Handling Middleware
 app.use((err, req, res, next) => {
@@ -45,11 +55,13 @@ app.use("/api/registros-acceso", registroAccesoRoutes);
 app.use("/api/wifi", wifiRoutes);
 app.use("/api/forzar-arranque", arranque_forzoso);
 app.use("/api/sistema", restaurarSistema);
+app.use("/api/notificaciones", notificaciones);
 
 // Error handling
 app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(500).json({ message: "Something went wrong!" });
 });
+
 
 export default app;
