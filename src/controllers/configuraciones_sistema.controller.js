@@ -145,3 +145,37 @@ export const checkEsp32Connectivity = async (req, res) => {
     });
   }
 };
+
+
+export const getEsp32Status = async (req, res) => {
+  try {
+    const { id_esp32 } = req.params;
+
+    // Verificar si la placa está registrada en la base de datos
+    const config = await ConfiguracionSistema.findById(id_esp32);
+
+    if (!config) {
+      return res.status(404).json({
+        message: `No se encontró una configuración para la ESP32 con ID ${id_esp32}.`,
+      });
+    }
+
+    // Simular verificación remota
+    const esp32Status = {
+      mode: "remote", // Esto indica que está en modo remoto (puedes ajustarlo según la lógica real)
+      data: {
+        connected: true,
+        ssid: config.ssid || "N/A",
+        ip: config.ip_address || "192.168.1.100",
+      },
+    };
+
+    return res.status(200).json({
+      message: "ESP32 conectada en modo remoto.",
+      ...esp32Status,
+    });
+  } catch (error) {
+    console.error("Error al obtener el estado de la ESP32:", error);
+    res.status(500).json({ message: "Error al obtener el estado de la ESP32." });
+  }
+};
