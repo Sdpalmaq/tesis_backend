@@ -21,7 +21,7 @@ const router = Router();
 
 router.post("/", [verifyToken, isAdmin, validateRequest], createUser);
 
-router.get("/", verifyToken, getUsers);
+router.get("/", getUsers);
 
 router.put(
   "/:cedula",

@@ -36,11 +36,11 @@ router.put(
   updateVehiculo
 );
 
-router.delete("/:id", [verifyToken], deleteVehiculo);
+router.delete("/:id", deleteVehiculo);
 
-router.get("/pending", [verifyToken, isAdmin], getPendingVehiculos);
+router.get("/pending", [isAdmin], getPendingVehiculos);
 
-router.patch("/:id/validate", [verifyToken, isAdmin], validateVehiculo);
+router.patch("/:id/validate", [isAdmin], validateVehiculo);
 
 router.get("/:propietario_cedula", getVehiculosByPropietario);
 

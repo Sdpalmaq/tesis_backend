@@ -12,7 +12,7 @@ const router = Router();
 
 router.post(
   "/",
-  [verifyToken, createRegistroAccesoValidator, validateRequest],
+  [ createRegistroAccesoValidator, validateRequest],
   createRegistroAcceso
 );
 
