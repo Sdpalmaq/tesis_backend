@@ -58,23 +58,31 @@ export const subscribeToTopic = (topicPattern, callback) => {
   client.on("message", (receivedTopic, message) => {
     const regex = /^sistema\/([^/]+)\/notificaciones$/; // Regex para extraer id_esp32
     const match = regex.exec(receivedTopic);
-
+  
     if (match) {
       const id_esp32 = match[1]; // Extraer id_esp32 del tópico
+      let parsedMessage;
+  
       try {
-        const parsedMessage = JSON.parse(message.toString()); // Parsear mensaje JSON
+        // Verificar si el mensaje ya es un objeto
+        if (typeof message === "object" && message !== null) {
+          parsedMessage = message;
+        } else {
+          parsedMessage = JSON.parse(message.toString());
+        }
+  
         console.log(`Mensaje recibido desde ${id_esp32}:`, parsedMessage);
-
-        if (callback) callback(parsedMessage, id_esp32); // Pasar id_esp32 al callback
+  
+        // Aquí retransmites a WebSocket si es necesario
+        if (callback) callback(parsedMessage, id_esp32);
       } catch (error) {
         console.error(`Error al procesar mensaje de ${id_esp32}:`, error);
       }
     } else {
-      console.warn(
-        `El tópico ${receivedTopic} no coincide con el patrón esperado.`
-      );
+      console.warn(`El tópico ${receivedTopic} no coincide con el patrón esperado.`);
     }
   });
+  
 };
 
 export default client;
