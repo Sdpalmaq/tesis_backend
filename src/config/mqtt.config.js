@@ -46,33 +46,20 @@ export const sendNotification = (id_esp32, message) => {
 };
 
 // Suscribirse a un tópico
-export const subscribeToTopic = (topicPattern, callback) => {
-  client.subscribe(topicPattern, { qos: 1 }, (error) => {
+export const subscribeToTopic = (topic, callback) => {
+  client.subscribe(topic, { qos: 1 }, (error) => {
     if (error) {
-      console.error(`Error al suscribirse al tópico ${topicPattern}:`, error);
+      console.error(`Error al suscribirse al tópico ${topic}:`, error);
     } else {
-      console.log(`Suscrito al tópico ${topicPattern}`);
+      console.log(`Suscrito al tópico ${topic}`);
     }
   });
 
   client.on("message", (receivedTopic, message) => {
-    const regex = /^sistema\/([^/]+)\/notificaciones$/; // Regex para extraer id_esp32
-    const match = regex.exec(receivedTopic);
-
-    if (match) {
-      const id_esp32 = match[1]; // Extraer id_esp32 del tópico
-      try {
-        const parsedMessage = JSON.parse(message.toString()); // Parsear mensaje JSON
-        console.log(`Mensaje recibido desde ${id_esp32}:`, parsedMessage);
-
-        if (callback) callback(parsedMessage, id_esp32); // Pasar id_esp32 al callback
-      } catch (error) {
-        console.error(`Error al procesar mensaje de ${id_esp32}:`, error);
-      }
-    } else {
-      console.warn(
-        `El tópico ${receivedTopic} no coincide con el patrón esperado.`
-      );
+    if (receivedTopic === topic) {
+      const parsedMessage = message.toString();
+      console.log(`Mensaje recibido en el tópico ${topic}:`, parsedMessage);
+      if (callback) callback(parsedMessage);
     }
   });
 };

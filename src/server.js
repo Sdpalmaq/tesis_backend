@@ -20,13 +20,13 @@ wss.on("connection", (ws) => {
 });
 
 // Suscribirse al tópico MQTT para eventos de ESP32
-subscribeToTopic("sistema/+/notificaciones", (message, id_esp32) => {
-  console.log(`Evento recibido del dispositivo ${id_esp32}:`, message);
+subscribeToTopic("sistema/eventos", (message) => {
+  console.log("Evento recibido desde MQTT:", message);
 
   // Retransmitir el evento a todos los clientes WebSocket conectados
   wss.clients.forEach((client) => {
     if (client.readyState === WebSocket.OPEN) {
-      client.send(JSON.stringify({ id: esp32Id, message: message.toString() }));
+      client.send(message);
     }
   });
 });
