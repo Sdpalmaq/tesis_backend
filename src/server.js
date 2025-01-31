@@ -7,28 +7,43 @@ const server = app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
 
-// Crear servidor WebSocket
 const wss = new WebSocketServer({ server });
 
-// Manejar conexiones WebSocket
+// Manejar conexiones WebSocket con más detalle
 wss.on("connection", (ws) => {
   console.log("Cliente conectado a WebSocket");
+
+  ws.on("message", (message) => {
+    try {
+      const data = JSON.parse(message);
+      // Procesar mensajes adicionales si es necesario
+    } catch (error) {
+      console.error("Error procesando mensaje", error);
+    }
+  });
 
   ws.on("close", () => {
     console.log("Cliente desconectado de WebSocket");
   });
 });
 
-// Suscribirse al tópico MQTT para eventos de ESP32
-subscribeToTopic("sistema/eventos", (message) => {
-  console.log("Evento recibido desde MQTT:", message);
-
-  // Retransmitir el evento a todos los clientes WebSocket conectados
+// Función para transmitir eventos
+function transmitirEvento(mensaje) {
   wss.clients.forEach((client) => {
     if (client.readyState === WebSocket.OPEN) {
-      client.send(message);
+      client.send(JSON.stringify(mensaje));
     }
   });
+}
+
+// Suscribir a tópicos MQTT
+subscribeToTopic("sistema/eventos", (message) => {
+  try {
+    const evento = JSON.parse(message);
+    transmitirEvento(evento);
+  } catch (error) {
+    console.error("Error procesando evento MQTT", error);
+  }
 });
 
 export { wss };

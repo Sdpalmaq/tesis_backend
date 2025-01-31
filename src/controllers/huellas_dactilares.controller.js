@@ -1,5 +1,5 @@
 import HuellasDactilares from "../models/huellas_dactilares.model.js";
-import { publishMessage } from "../config/mqtt.config.js";
+import { publishMessage, subscribeToTopic } from "../config/mqtt.config.js";
 import pool from "../config/database.js";
 
 export const registrarHuella = async (req, res) => {
@@ -25,25 +25,50 @@ export const registrarHuella = async (req, res) => {
         .json({ error: "La huella ya está registrada en esta placa." });
     }
 
-    // Publicar al tópico MQTT para iniciar registro de huella en la placa
+    // Tópico para registrar huella en la ESP32
     const topic = `sistema/${id_esp32}/huella/registrar`;
     const message = JSON.stringify({ id_huella, nombre_persona, dedo });
+    const responseTopic = `sistema/${id_esp32}/huella/respuesta`;
+
+    // Publicar mensaje al tópico MQTT
     publishMessage(topic, message);
+    console.log("Mensaje publicado para registrar huella:", message);
 
-    // Guardar la huella en la base de datos
-    const nuevaHuella = await HuellasDactilares.create({
-      id_esp32,
-      id_huella,
-      nombre_persona,
-      dedo,
-      usuario_cedula,
-      vehiculo_id,
-    });
+    // Escuchar el tópico de respuesta por un tiempo limitado
+    const timeout = setTimeout(() => {
+      res.status(504).json({ error: "No se recibió respuesta de la ESP32." });
+    }, 10000); // 10 segundos de espera
 
-    res.status(201).json({
-      message:
-        "Solicitud enviada a la placa y huella registrada en la base de datos.",
-      data: nuevaHuella,
+    subscribeToTopic(responseTopic, async (receivedMessage) => {
+      clearTimeout(timeout); // Cancelar el temporizador si se recibe respuesta
+      const parsedMessage = JSON.parse(receivedMessage);
+
+      // Validar que la respuesta corresponde al ID de huella enviado
+      if (
+        parsedMessage.id_huella === id_huella &&
+        parsedMessage.status === "success"
+      ) {
+        // Guardar la huella en la base de datos
+        const nuevaHuella = await HuellasDactilares.create({
+          id_esp32,
+          id_huella,
+          nombre_persona,
+          dedo,
+          usuario_cedula,
+          vehiculo_id,
+        });
+
+        res.status(201).json({
+          message:
+            "Huella registrada en la ESP32 y guardada en la base de datos.",
+          data: nuevaHuella,
+        });
+      } else {
+        res.status(500).json({
+          error: "Error al registrar huella en la ESP32.",
+          details: parsedMessage,
+        });
+      }
     });
   } catch (error) {
     console.error("Error al registrar huella:", error);
