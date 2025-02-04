@@ -1,4 +1,7 @@
 import mqtt from "mqtt";
+import pool  from "./database.js";
+import { createConfiguracion } from "../controllers/configuraciones_sistema.controller.js"; // Importar controlador
+
 
 // Configuración del cliente MQTT
 const options = {
@@ -14,7 +17,42 @@ const options = {
 const client = mqtt.connect(options);
 
 client.on("connect", () => {
-  console.log("Conexión exitosa al servidor MQTT");
+  console.log("✅ Conectado a MQTT");
+
+  // Suscribirse a la configuración de ESP32
+  client.subscribe("sistema/+/configuracion", (err) => {
+    if (err) {
+      console.error("❌ Error al suscribirse al tópico de configuración:", err);
+    } else {
+      console.log("✅ Suscrito a sistema/+/configuracion");
+    }
+  });
+});
+
+// Procesar mensajes recibidos en MQTT
+client.on("message", async (topic, message) => {
+  console.log(`📩 Mensaje recibido en ${topic}: ${message.toString()}`);
+
+  try {
+      const data = JSON.parse(message.toString());
+
+      // Llamar a la función del controlador en lugar de hacer la consulta manualmente
+      const req = { body: data };
+      const res = {
+          status: (code) => ({
+              json: (response) => console.log(`📡 Respuesta del backend (${code}):`, response),
+          }),
+      };
+
+      await createConfiguracion(req, res);
+
+      // Enviar confirmación a la ESP32
+      const responseTopic = `sistema/${data.id_esp32}/respuesta`;
+      client.publish(responseTopic, JSON.stringify({ status: "success", id_esp32: data.id_esp32 }));
+
+  } catch (error) {
+      console.error("❌ Error procesando el mensaje de configuración de ESP32:", error);
+  }
 });
 
 client.on("error", (error) => {

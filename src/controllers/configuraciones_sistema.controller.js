@@ -1,5 +1,6 @@
 import ConfiguracionSistema from "../models/configuraciones_sistema.model.js";
 import axios from "axios";
+import pool from "../config/database.js";
 
 // Crear una nueva placa ESP32
 export const createConfiguracion = async (req, res) => {
@@ -10,6 +11,21 @@ export const createConfiguracion = async (req, res) => {
       return res
         .status(400)
         .json({ error: "El campo id_esp32 es obligatorio." });
+    }
+
+    // Verificar si la ESP32 ya está registrada
+    const existingConfig = await pool.query(
+      "SELECT * FROM configuraciones_sistema WHERE id_esp32 = $1",
+      [id_esp32]
+    );
+
+    if (existingConfig.rows.length > 0) {
+      return res
+        .status(200)
+        .json({
+          message: "⚠️ La ESP32 ya está registrada.",
+          data: existingConfig.rows[0],
+        });
     }
 
     const nuevaConfiguracion = await ConfiguracionSistema.create(
@@ -146,7 +162,6 @@ export const checkEsp32Connectivity = async (req, res) => {
   }
 };
 
-
 export const getEsp32Status = async (req, res) => {
   try {
     const { id_esp32 } = req.params;
@@ -176,6 +191,8 @@ export const getEsp32Status = async (req, res) => {
     });
   } catch (error) {
     console.error("Error al obtener el estado de la ESP32:", error);
-    res.status(500).json({ message: "Error al obtener el estado de la ESP32." });
+    res
+      .status(500)
+      .json({ message: "Error al obtener el estado de la ESP32." });
   }
 };
