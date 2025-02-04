@@ -5,7 +5,7 @@ import {
   getConfiguraciones,
   associateConfiguracion,
   deleteConfiguracion,
-  getEsp32Status,
+  getESP32Disponibles
 } from "../controllers/configuraciones_sistema.controller.js";
 
 const router = express.Router();
@@ -25,6 +25,6 @@ router.put("/:id_esp32", associateConfiguracion);
 // Eliminar una placa ESP32
 router.delete("/:id_esp32", deleteConfiguracion);
 
-router.get("/esp32/:id_esp32", getEsp32Status);
+router.get("/esp32-disponibles", getESP32Disponibles);
 
 export default router;

@@ -1,5 +1,7 @@
 import Vehiculo from "../models/vehiculos.model.js";
 import Usuarios from "../models/user.model.js";
+import pool from "../config/database.js";
+import { associateConfiguracion } from "./configuraciones_sistema.controller.js"; // Importar función
 
 export const createVehiculo = async (req, res) => {
   try {
@@ -155,21 +157,60 @@ export const getVehiculosByPropietario = async (req, res) => {
 
 // Asociar ESP32 a un vehículo
 export const associateESP32 = async (req, res) => {
-  const { id, id_esp32 } = req.body;
+  const { id, id_esp32 } = req.body; // id = ID del vehículo
 
   try {
-    const vehiculo = await Vehiculo.findById(id);
-    if (!vehiculo) {
-      return res.status(404).json({ error: "Vehículo no encontrado" });
+    // Verificar si el vehículo existe
+    const vehiculo = await pool.query("SELECT * FROM vehiculos WHERE id = $1", [
+      id,
+    ]);
+    if (vehiculo.rows.length === 0) {
+      return res.status(404).json({ error: "❌ Vehículo no encontrado" });
     }
 
-    const updatedVehiculo = await Vehiculo.updateESP32(id, id_esp32);
+    // Verificar si la ESP32 existe en la base de datos
+    const esp32 = await pool.query(
+      "SELECT * FROM configuraciones_sistema WHERE id_esp32 = $1",
+      [id_esp32]
+    );
+
+    if (esp32.rows.length === 0) {
+      return res
+        .status(404)
+        .json({ error: "❌ ESP32 no encontrada en la base de datos" });
+    }
+
+    // Verificar si la ESP32 ya está asociada a otro vehículo
+    const vehiculoExistente = await pool.query(
+      "SELECT * FROM vehiculos WHERE id_esp32 = $1",
+      [id_esp32]
+    );
+
+    if (vehiculoExistente.rows.length > 0) {
+      return res
+        .status(400)
+        .json({ error: "⚠️ Esta ESP32 ya está asociada a otro vehículo" });
+    }
+
+    // Asociar la ESP32 al vehículo
+    const updatedVehiculo = await pool.query(
+      "UPDATE vehiculos SET id_esp32 = $1 WHERE id = $2 RETURNING *",
+      [id_esp32, id]
+    );
+
+    // Actualizar el estado de asociado en configuraciones_sistema
+    const reqAsociacion = {
+      params: { id_esp32 },
+      body: { descripcion: "ESP32 asignada a un vehículo" },
+    };
+    await associateConfiguracion(reqAsociacion, res);
+
     res.status(200).json({
-      message: "ESP32 asociado correctamente al vehículo.",
-      vehiculo: updatedVehiculo,
+      message: "✅ ESP32 asociada correctamente al vehículo.",
+      vehiculo: updatedVehiculo.rows[0],
     });
   } catch (error) {
-    console.error("Error al asociar ESP32:", error);
+    console.error("❌ Error al asociar ESP32:", error);
     res.status(500).json({ error: "Error en el servidor" });
   }
 };
