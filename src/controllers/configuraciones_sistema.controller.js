@@ -1,5 +1,6 @@
 import ConfiguracionSistema from "../models/configuraciones_sistema.model.js";
 import axios from "axios";
+import pool from "../config/database.js";
 
 // Crear una nueva placa ESP32
 export const createConfiguracion = async (req, res) => {
@@ -30,7 +31,7 @@ export const getConfiguracionById = async (req, res) => {
     const configuracion = await ConfiguracionSistema.findById(id_esp32);
 
     if (!configuracion) {
-      return res.status(404).json({ error: "Placa ESP32 no encontrada." });
+      return res.status(404).json({ error: "Placa ESP32 no encontrada. 1" });
     }
 
     res.json(configuracion);
@@ -63,7 +64,7 @@ export const associateConfiguracion = async (req, res) => {
     );
 
     if (!configuracionActualizada) {
-      return res.status(404).json({ error: "Placa ESP32 no encontrada." });
+      return res.status(404).json({ error: "Placa ESP32 no encontrada.2" });
     }
 
     res.json(configuracionActualizada);
@@ -81,7 +82,7 @@ export const deleteConfiguracion = async (req, res) => {
     const eliminado = await ConfiguracionSistema.delete(id_esp32);
 
     if (!eliminado) {
-      return res.status(404).json({ error: "Placa ESP32 no encontrada." });
+      return res.status(404).json({ error: "Placa ESP32 no encontrada.3" });
     }
 
     res.json({ message: "Configuración eliminada correctamente." });
@@ -175,7 +176,7 @@ export const getEsp32Status = async (req, res) => {
   }
 };
 
-export const getESP32Disponibles = async (req, res) => {
+export const getESP32Dis = async (req, res) => {
   try {
     const result = await pool.query(
       "SELECT id_esp32 FROM configuraciones_sistema WHERE asociado = false"
