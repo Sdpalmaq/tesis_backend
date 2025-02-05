@@ -38,9 +38,9 @@ router.put(
 
 router.delete("/:id", deleteVehiculo);
 
-router.get("/pending", [isAdmin], getPendingVehiculos);
+router.get("/pending",  getPendingVehiculos);
 
-router.patch("/:id/validate", [isAdmin], validateVehiculo);
+router.patch("/:id/validate", validateVehiculo);
 
 router.get("/:propietario_cedula", getVehiculosByPropietario);
 
