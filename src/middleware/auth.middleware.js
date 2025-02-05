@@ -3,7 +3,7 @@ import pool  from "../config/database.js";
 
 export const verifyToken = async (req, res, next) => {
     try {
-        const token = req.cookies.token; // ✅ Leer el token desde la cookie
+        const token = req.cookies.jwt; // ✅ Leer el token desde la cookie
 
         if (!token) {
             return res.status(401).json({ error: "Acceso denegado. No autenticado." });
