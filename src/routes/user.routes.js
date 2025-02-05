@@ -19,13 +19,13 @@ import {
 
 const router = Router();
 
-router.post("/", [verifyToken, isAdmin, validateRequest], createUser);
+router.post("/", [ isAdmin, validateRequest], createUser);
 
 router.get("/", getUsers);
 
 router.put(
   "/:cedula",
-  [verifyToken, isAdmin, updateUserValidator, validateRequest],
+  [isAdmin, updateUserValidator, validateRequest],
   updateUser
 );
 
@@ -35,7 +35,7 @@ router.patch(
   updatePassword
 );
 
-router.delete("/:cedula", [verifyToken, isAdmin], deleteUser);
+router.delete("/:cedula", [ isAdmin], deleteUser);
 
 router.post("/password-reset", requestPasswordReset); //solicitar enlace
 router.post("/reset-password", resetPassword); //resetear contraseña
