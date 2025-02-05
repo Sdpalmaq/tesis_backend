@@ -1,25 +1,17 @@
-import jwt from "jsonwebtoken";
-import pool  from "../config/database.js";
+import jwt from 'jsonwebtoken';
 
-export const verifyToken = async (req, res, next) => {
-    try {
-        const token = req.cookies.jwt; // ✅ Leer el token desde la cookie
+export const verifyToken = (req, res, next) => {
+  const token = req.cookies.jwt;
+  
+  if (!token) {
+    return res.status(401).json({ message: "No token provided" });
+  }
 
-        if (!token) {
-            return res.status(401).json({ error: "Acceso denegado. No autenticado." });
-        }
-
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        const userResult = await pool.query("SELECT * FROM usuarios WHERE cedula = $1", [decoded.cedula]);
-
-        if (userResult.rows.length === 0) {
-            return res.status(401).json({ error: "Usuario no encontrado." });
-        }
-
-        req.user = userResult.rows[0]; // ✅ Asignar usuario a req.user
-        next();
-    } catch (error) {
-        return res.status(401).json({ error: "Token inválido o expirado." });
-    }
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    req.user = decoded;
+    next();
+  } catch (error) {
+    return res.status(401).json({ message: "Invalid token" });
+  }
 };
-
