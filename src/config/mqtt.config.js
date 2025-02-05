@@ -34,14 +34,21 @@ client.on("message", async (topic, message) => {
   console.log(`📩 Mensaje recibido en ${topic}: ${message.toString()}`);
 
   try {
-      const data = JSON.parse(message.toString());
+    const data = JSON.parse(message.toString());
 
-      // Llamar a la función del controlador en lugar de hacer la consulta manualmente
+    // Verificar si ya existe una configuración para esta ESP32
+    const { rows } = await pool.query(
+      'SELECT * FROM configuraciones_sistema WHERE id_esp32 = $1', 
+      [data.id_esp32]
+    );
+
+    // Solo crear configuración si no existe
+    if (rows.length === 0) {
       const req = { body: data };
       const res = {
-          status: (code) => ({
-              json: (response) => console.log(`📡 Respuesta del backend (${code}):`, response),
-          }),
+        status: (code) => ({
+          json: (response) => console.log(`📡 Respuesta del backend (${code}):`, response),
+        }),
       };
 
       await createConfiguracion(req, res);
@@ -49,9 +56,12 @@ client.on("message", async (topic, message) => {
       // Enviar confirmación a la ESP32
       const responseTopic = `sistema/${data.id_esp32}/respuesta`;
       client.publish(responseTopic, JSON.stringify({ status: "success", id_esp32: data.id_esp32 }));
+    } else {
+      console.log(`📌 Configuración ya existe para ESP32: ${data.id_esp32}`);
+    }
 
   } catch (error) {
-      console.error("❌ Error procesando el mensaje de configuración de ESP32:", error);
+    console.error("❌ Error procesando el mensaje de configuración de ESP32:", error);
   }
 });
 
