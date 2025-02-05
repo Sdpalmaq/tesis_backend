@@ -37,7 +37,7 @@ app.use((err, req, res, next) => {
 // Middlewares
 app.use(
   cors({
-    origin: "https://tesis-frontend-nine.vercel.app/" || "http://localhost:3000",
+    origin: "https://tesis-frontend-nine.vercel.app" || "http://localhost:3000",
     credentials: true,
   })
 );
