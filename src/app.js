@@ -23,6 +23,7 @@ import wifiRoutes from "./routes/wifi.routes.js";
 import arranque_forzoso from "./routes/arranque_forzoso.routes.js";
 import restaurarSistema from "./routes/restaurarSistema.routes.js";
 import notificaciones from "./routes/notificaciones.routes.js";
+import interoperabilidadRoutes from "./routes/interoperabilidad.routes.js";
 
 
 
@@ -56,6 +57,8 @@ app.use("/api/wifi", wifiRoutes);
 app.use("/api/forzar-arranque", arranque_forzoso);
 app.use("/api/sistema", restaurarSistema);
 app.use("/api/notificaciones", notificaciones);
+app.use("/api", interoperabilidadRoutes);
+
 
 // Error handling
 app.use((err, req, res, next) => {
