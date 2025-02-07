@@ -18,10 +18,11 @@ export const enviarDato = async (req, res) => {
   publishMessage(topic, JSON.stringify({ mensaje }), (error) => {
     if (!error) {
       datosSinErrores++; // Aumentar conteo si se publicó sin error
+        console.log(`✅ Mensaje publicado en MQTT:`, mensaje);
     } else {
       console.error(`❌ Error al publicar mensaje en MQTT:`, error);
     }
-    
+
   });
 
   res.status(200).json({ message: "Dato enviado correctamente" });
