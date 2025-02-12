@@ -21,7 +21,7 @@ const router = Router();
 
 router.post(
   "/",
-  [ createVehiculoValidator, validateRequest],
+  [ createVehiculoValidator, verifyToken, isAdmin,validateRequest],
   createVehiculo
 );
 

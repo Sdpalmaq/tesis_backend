@@ -10,11 +10,12 @@ class HuellasDactilares {
       dedo,
       usuario_cedula,
       vehiculo_id,
+      imagen
     } = huellaData;
 
     const query = `
-      INSERT INTO huellas_dactilares (id_esp32, id_huella, nombre_persona, dedo, usuario_cedula, vehiculo_id)
-      VALUES ($1, $2, $3, $4, $5, $6)
+      INSERT INTO huellas_dactilares (id_esp32, id_huella, nombre_persona, dedo, usuario_cedula, vehiculo_id, imagen)
+      VALUES ($1, $2, $3, $4, $5, $6,$7)
       RETURNING *;
     `;
     const values = [
@@ -24,6 +25,7 @@ class HuellasDactilares {
       dedo,
       usuario_cedula,
       vehiculo_id,
+      imagen,
     ];
     const result = await pool.query(query, values);
     return result.rows[0];
