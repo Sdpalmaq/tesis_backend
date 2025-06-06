@@ -1,6 +1,13 @@
 import { WebSocketServer } from "ws";
+import cors from "cors";
+
 import app from "./app.js"; // Tu app de Express
 import { subscribeToTopic } from "./config/mqtt.config.js";
+
+app.use(cors({
+  origin: "https://tesis-frontend-dckmg9m51-sdpalmaqs-projects.vercel.app",
+  credentials: true
+}));
 
 const PORT = process.env.PORT || 3000;
 const server = app.listen(PORT, () => {

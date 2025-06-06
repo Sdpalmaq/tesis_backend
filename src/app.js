@@ -1,5 +1,5 @@
 import express from "express";
-import cors from "cors";
+//import cors from "cors";
 import cookieParser from "cookie-parser";
 import "dotenv/config";
 import morgan from "morgan";
@@ -36,12 +36,13 @@ app.use((err, req, res, next) => {
 });
 
 // Middlewares
+/*
 app.use(
   cors({
     origin: "https://tesis-frontend-nine.vercel.app" || "http://localhost:3000",
     credentials: true,
   })
-);
+);*/
 app.use(cookieParser(process.env.COOKIE_SECRET));
 app.use(express.json());
 app.use(morgan("combined")); // Logs detallados
