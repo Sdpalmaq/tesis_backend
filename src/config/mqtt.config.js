@@ -1,16 +1,15 @@
 import mqtt from "mqtt";
 import pool from "./database.js";
-import { createConfiguracion } from "../controllers/configuraciones_sistema.controller.js"; // Importar controlador
 import { crearConfiguracionSiNoExiste } from "../services/configuraciones.service.js";
 
 // Configuración del cliente MQTT
 const options = {
-  host: "df6522c08e0b44129df99259929215a3.s1.eu.hivemq.cloud", // Cambiar por tu host MQTT
+  host: "df6522c08e0b44129df99259929215a3.s1.eu.hivemq.cloud",
   port: 8883,
   protocol: "mqtts",
-  username: "Sdpalmaq2", // Cambiar por tu usuario MQTT
-  password: "St@0402003602", // Cambiar por tu contraseña MQTT
-  reconnectPeriod: 5000, // Intentar reconexión cada 5 segundos
+  username: "Sdpalmaq2",
+  password: "St@0402003602",
+  reconnectPeriod: 5000,
 };
 
 // Crear cliente MQTT
@@ -19,7 +18,6 @@ const client = mqtt.connect(options);
 client.on("connect", () => {
   console.log("✅ Conectado a MQTT");
 
-  // Suscribirse a la configuración de ESP32
   client.subscribe("sistema/+/configuracion", (err) => {
     if (err) {
       console.error("❌ Error al suscribirse al tópico de configuración:", err);
@@ -29,38 +27,30 @@ client.on("connect", () => {
   });
 });
 
-// Procesar mensajes recibidos en MQTT
 client.on("message", async (topic, message) => {
   console.log(`📩 Mensaje recibido en ${topic}: ${message.toString()}`);
 
   try {
     const data = JSON.parse(message.toString());
 
-    // Verificar si ya existe una configuración para esta ESP32
-    const { rows } = await pool.query(
-      "SELECT * FROM configuraciones_sistema WHERE id_esp32 = $1",
-      [data.id_esp32]
-    );
+    if (!data.id_esp32) {
+      console.warn("⚠️ Mensaje MQTT ignorado: falta id_esp32");
+      return;
+    }
 
-    // Solo crear configuración si no existe
-    if (rows.length === 0) {
-      const resultado = await crearConfiguracionSiNoExiste(data);
+    const resultado = await crearConfiguracionSiNoExiste(data);
 
-      if (resultado.creado) {
-        console.log(`✅ Configuración creada para ESP32 ${data.id_esp32}`);
-      } else {
-        console.log(`📌 Configuración ya existía para ESP32: ${data.id_esp32}`);
-      }
-
-      // Enviar confirmación a la ESP32
-      const responseTopic = `sistema/${data.id_esp32}/respuesta`;
-      client.publish(
-        responseTopic,
-        JSON.stringify({ status: "success", id_esp32: data.id_esp32 })
-      );
+    if (resultado.creado) {
+      console.log(`✅ Configuración creada para ESP32: ${data.id_esp32}`);
     } else {
       console.log(`📌 Configuración ya existe para ESP32: ${data.id_esp32}`);
     }
+
+    const responseTopic = `sistema/${data.id_esp32}/respuesta`;
+    client.publish(
+      responseTopic,
+      JSON.stringify({ status: "success", id_esp32: data.id_esp32 })
+    );
   } catch (error) {
     console.error(
       "❌ Error procesando el mensaje de configuración de ESP32:",
@@ -81,7 +71,6 @@ client.on("close", () => {
   console.log("Conexión MQTT cerrada.");
 });
 
-// Publicar mensaje a un tópico
 export const publishMessage = (topic, message) => {
   client.publish(topic, message, { qos: 1 }, (error) => {
     if (error) {
@@ -97,7 +86,6 @@ export const sendNotification = (id_esp32, message) => {
   publishMessage(topic, JSON.stringify({ message }));
 };
 
-// Suscribirse a un tópico
 export const subscribeToTopic = (topic, callback) => {
   client.subscribe(topic, { qos: 1 }, (error) => {
     if (error) {
