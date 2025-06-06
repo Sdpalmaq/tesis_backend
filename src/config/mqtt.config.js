@@ -1,7 +1,7 @@
 import mqtt from "mqtt";
-import pool  from "./database.js";
+import pool from "./database.js";
 import { createConfiguracion } from "../controllers/configuraciones_sistema.controller.js"; // Importar controlador
-
+import { crearConfiguracionSiNoExiste } from "../services/configuraciones.service.js";
 
 // Configuración del cliente MQTT
 const options = {
@@ -38,30 +38,34 @@ client.on("message", async (topic, message) => {
 
     // Verificar si ya existe una configuración para esta ESP32
     const { rows } = await pool.query(
-      'SELECT * FROM configuraciones_sistema WHERE id_esp32 = $1', 
+      "SELECT * FROM configuraciones_sistema WHERE id_esp32 = $1",
       [data.id_esp32]
     );
 
     // Solo crear configuración si no existe
     if (rows.length === 0) {
-      const req = { body: data };
-      const res = {
-        status: (code) => ({
-          json: (response) => console.log(`📡 Respuesta del backend (${code}):`, response),
-        }),
-      };
+      const resultado = await crearConfiguracionSiNoExiste(data);
 
-      await createConfiguracion(req, res);
+      if (resultado.creado) {
+        console.log(`✅ Configuración creada para ESP32 ${data.id_esp32}`);
+      } else {
+        console.log(`📌 Configuración ya existía para ESP32: ${data.id_esp32}`);
+      }
 
       // Enviar confirmación a la ESP32
       const responseTopic = `sistema/${data.id_esp32}/respuesta`;
-      client.publish(responseTopic, JSON.stringify({ status: "success", id_esp32: data.id_esp32 }));
+      client.publish(
+        responseTopic,
+        JSON.stringify({ status: "success", id_esp32: data.id_esp32 })
+      );
     } else {
       console.log(`📌 Configuración ya existe para ESP32: ${data.id_esp32}`);
     }
-
   } catch (error) {
-    console.error("❌ Error procesando el mensaje de configuración de ESP32:", error);
+    console.error(
+      "❌ Error procesando el mensaje de configuración de ESP32:",
+      error
+    );
   }
 });
 
