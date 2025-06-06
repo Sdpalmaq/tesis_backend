@@ -36,13 +36,7 @@ app.use((err, req, res, next) => {
 });
 
 // Middlewares
-/*
-app.use(
-  cors({
-    origin: "https://tesis-frontend-nine.vercel.app" || "http://localhost:3000",
-    credentials: true,
-  })
-);*/
+
 app.use(cookieParser(process.env.COOKIE_SECRET));
 app.use(express.json());
 app.use(morgan("combined")); // Logs detallados
