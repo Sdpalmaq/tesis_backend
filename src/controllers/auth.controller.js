@@ -6,12 +6,12 @@ export const login = async (req, res) => {
     try {
       const user = await User.findByEmail(correo);
       if (!user) {
-        return res.status(401).json({ message: "Usuario o contraseña incorrectos" });
+        return res.status(401).json({ message: "Usuario incorrectos" });
       }
   
       const validPassword = await User.verifyPassword(user.contrasena, contrasena);
       if (!validPassword) {
-        return res.status(401).json({ message: "Usuario o contraseña incorrectos" });
+        return res.status(401).json({ message: "Contraseña incorrectos" });
       }
 
       if (user.debe_cambiar_contrasena) {
