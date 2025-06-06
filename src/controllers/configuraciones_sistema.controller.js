@@ -7,12 +7,7 @@ export const createConfiguracion = async (req, res) => {
   try {
     const { id_esp32, descripcion } = req.body;
 
-    if (!id_esp32) {
-      return res
-        .status(400)
-        .json({ error: "El campo id_esp32 es obligatorio." });
-    }
-
+   
     const nuevaConfiguracion = await ConfiguracionSistema.create(
       id_esp32,
       descripcion
