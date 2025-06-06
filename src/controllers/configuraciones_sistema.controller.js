@@ -2,6 +2,7 @@ import ConfiguracionSistema from "../models/configuraciones_sistema.model.js";
 import axios from "axios";
 import pool from "../config/database.js";
 
+/*
 // Crear una nueva placa ESP32
 export const createConfiguracion = async (req, res) => {
   try {
@@ -22,7 +23,7 @@ export const createConfiguracion = async (req, res) => {
     console.error("Error al crear la configuración:", error);
     res.status(500).json({ error: "Error al crear la configuración." });
   }
-};
+};*/
 
 // Obtener una placa ESP32 por ID
 export const getConfiguracionById = async (req, res) => {
