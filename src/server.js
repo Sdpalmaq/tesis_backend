@@ -5,8 +5,13 @@ import app from "./app.js"; // Tu app de Express
 import { subscribeToTopic } from "./config/mqtt.config.js";
 
 app.use(cors({
-  origin: "https://tesis-frontend-dckmg9m51-sdpalmaqs-projects.vercel.app",
-  credentials: true
+  origin: [
+    "http://localhost:5173",
+    "https://tesis-frontend-dckmg9m51-sdpalmaqs-projects.vercel.app"
+  ],
+  credentials: true,
+  methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"]
 }));
 
 const PORT = process.env.PORT || 3000;
