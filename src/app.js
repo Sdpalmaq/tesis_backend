@@ -1,5 +1,6 @@
 import express from "express";
 //import cors from "cors";
+import cors from "cors";
 import cookieParser from "cookie-parser";
 import "dotenv/config";
 import morgan from "morgan";
@@ -11,6 +12,22 @@ app.use((req, res, next) => {
     req.wss = wss; // Agregar la instancia del WebSocket Server a cada request
     next();
 });
+
+const corsOptions = {
+  origin: [
+    "http://localhost:5173",
+    "https://tesis-frontend-dckmg9m51-sdpalmaqs-projects.vercel.app"
+  ],
+  credentials: true,
+  methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"]
+};
+
+// ✅ Permite CORS en todas las peticiones
+app.use(cors(corsOptions));
+
+// ✅ Permite responder a OPTIONS preflight
+app.options("*", cors(corsOptions));
 
 
 import authRoutes from "./routes/auth.routes.js";
