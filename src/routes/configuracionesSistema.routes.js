@@ -12,7 +12,7 @@ import {
 const router = express.Router();
 
 // Crear una nueva placa ESP32
-router.post("/", createConfiguracion);
+//router.post("/", createConfiguracion);
 
 // Obtener todas las placas ESP32
 router.get("/", getConfiguraciones);
