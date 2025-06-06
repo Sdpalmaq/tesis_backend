@@ -1,5 +1,5 @@
 // services/configuraciones.service.js
-import pool from "../database.js";
+import pool from "../config/database.js";
 
 export async function crearConfiguracionSiNoExiste(data) {
   const { id_esp32, descripcion, asociado } = data;

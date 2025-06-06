@@ -1,6 +1,5 @@
 import express from "express";
 import {
-  createConfiguracion,
   getConfiguracionById,
   getConfiguraciones,
   associateConfiguracion,
