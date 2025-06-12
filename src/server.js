@@ -7,7 +7,7 @@ import { subscribeToTopic } from "./config/mqtt.config.js";
 const corsOptions = {
   origin: [
     "http://localhost:5173",
-    "https://tesis-frontend-dckmg9m51-sdpalmaqs-projects.vercel.app"
+    "https://tesis-frontend-nine.vercel.app/"
   ],
   credentials: true,
   methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
