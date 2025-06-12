@@ -16,7 +16,7 @@ app.use((req, res, next) => {
 const corsOptions = {
   origin: [
     "http://localhost:5173",
-    "https://tesis-frontend-nine.vercel.app/"
+    "https://tesis-frontend-nine.vercel.app"
   ],
   credentials: true,
   methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
