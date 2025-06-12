@@ -140,7 +140,7 @@ export const requestPasswordReset = async (req, res) => {
     });
 
     // Enviar correo con el enlace de recuperación
-    const resetLink = `http://localhost:5173/reset-password?token=${token}`;
+    const resetLink = `https://tesis-frontend-dckmg9m51-sdpalmaqs-projects.vercel.app/reset-password?token=${token}`;
     const emailContent = `
       Hola ${user.nombre},
       
