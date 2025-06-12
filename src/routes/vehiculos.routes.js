@@ -29,7 +29,7 @@ router.post(
 router.post("/asociar-esp32", associateESP32);
 
 router.get("/",  getVehiculos);
-
+ 
 router.put(
   "/:id",
   [updateVehiculoValidator, validateRequest],
